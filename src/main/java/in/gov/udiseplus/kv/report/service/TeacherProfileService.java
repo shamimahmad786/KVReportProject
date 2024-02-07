@@ -15,7 +15,7 @@ public interface TeacherProfileService {
 
 	public ResponseEntity<?> getTeacherDetailsPdf(ConfirmedTeacherDetailsResp dataObj,TeacherConfirmation dataObj1) throws IOException;
 
-	public ResponseEntity<?> genTransferOrderPdf()throws IOException;
-
 	public ResponseEntity<?> genTeacherConfirmation(String token, String username, Integer teacherId)throws IOException;
+
+	public ResponseEntity<?> genTransManagementPdf()throws IOException;
 }

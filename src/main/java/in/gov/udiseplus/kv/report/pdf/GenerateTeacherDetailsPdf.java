@@ -95,15 +95,16 @@ public class GenerateTeacherDetailsPdf {
 
 
 			Image imagehead = null;
-			try {
-				InputStream is = getClass().getResourceAsStream("/static/images/kvs-logo.png");
-				imagehead = new Image(ImageDataFactory.create(inputStreamToByteArray(is)));
-				//imagehead.scaleAbsolute(100, 50);
-				imagehead.setFixedPosition(32, 750);
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (i == 1) {
+				try {
+					InputStream is = getClass().getResourceAsStream("/static/images/kvs-logo.png");
+					imagehead = new Image(ImageDataFactory.create(inputStreamToByteArray(is)));
+					// imagehead.scaleAbsolute(100, 50);
+					imagehead.setFixedPosition(32, 750);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			
 			Image imagefooter = null;
 			try {
 				InputStream is = getClass().getResourceAsStream("/static/images/kvs-nic-logo.png");
@@ -120,7 +121,8 @@ public class GenerateTeacherDetailsPdf {
 			canvasImage.setExtGState(gstate);
 			try (Canvas canvas2 = new Canvas(canvasImage, pdfDoc, pageSize)) {
 				canvas2.add(imagefooter);
-				canvas2.add(imagehead);
+				if(imagehead !=null)
+					canvas2.add(imagehead);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -138,7 +140,7 @@ public class GenerateTeacherDetailsPdf {
 	
 	
 	
-	public ResponseEntity<?> downloadTeacherDetailsPdf(ConfirmedTeacherDetailsResp dataObj,TeacherConfirmation dataObj1) throws IOException {
+	public ResponseEntity<?> downloadTeacherDetailsPdf(ConfirmedTeacherDetailsResp dataObj, TeacherConfirmation dataObj1) throws IOException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		PdfWriter write = new PdfWriter(byteArrayOutputStream);
 		write.setSmartMode(true);

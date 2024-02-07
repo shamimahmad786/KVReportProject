@@ -54,9 +54,9 @@ public class TeahcerBasicProfileReportController {
 	
 	
 	
-	@GetMapping(value = "/genTransferOrderPdf")
-	public ResponseEntity<?> fetchTransferOrderPdf() throws IOException {
-		ResponseEntity<?> resp=teacherProfileService.genTransferOrderPdf();
+	@GetMapping(value = "/genTransferManagementPdf")
+	public ResponseEntity<?> fetchTransManagementPdf() throws IOException {
+		ResponseEntity<?> resp=teacherProfileService.genTransManagementPdf();
 		return resp;
 	}
 }

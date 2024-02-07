@@ -22,6 +22,7 @@ import in.gov.udiseplus.kv.report.bean.Response;
 import in.gov.udiseplus.kv.report.bean.TeacherConfirmation;
 import in.gov.udiseplus.kv.report.bean.TeacherConfirmationResp;
 import in.gov.udiseplus.kv.report.pdf.GenerateTeacherDetailsPdf;
+import in.gov.udiseplus.kv.report.pdf.TransManagementPdf;
 import in.gov.udiseplus.kv.report.service.TeacherProfileService;
 import in.gov.udiseplus.kv.report.utill.ErrorResponse;
 import in.gov.udiseplus.kv.report.utill.StandardErrorMessages;
@@ -37,6 +38,9 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 	
 	@Autowired
 	private GenerateTeacherDetailsPdf generateTeacherDetailsPdf;
+	
+	@Autowired
+	private TransManagementPdf transManagementPdf;
 
 	@Value("${report.api.url}")
 	private String reportBaseUrl;
@@ -115,9 +119,9 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 	
 
 	@Override
-	public ResponseEntity<?> genTransferOrderPdf() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	public ResponseEntity<?> genTransManagementPdf() throws IOException {
+		return transManagementPdf.downloadTransManagementPdf();
 	}
+
 
 }
