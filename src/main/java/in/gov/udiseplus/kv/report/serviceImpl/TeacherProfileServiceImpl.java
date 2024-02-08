@@ -2,6 +2,7 @@ package in.gov.udiseplus.kv.report.serviceImpl;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,11 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import in.gov.udiseplus.kv.report.bean.ConfirmedTeacherDetailsResp;
 import in.gov.udiseplus.kv.report.bean.Response;
+import in.gov.udiseplus.kv.report.bean.TcDcPointResp;
 import in.gov.udiseplus.kv.report.bean.TeacherConfirmation;
 import in.gov.udiseplus.kv.report.bean.TeacherConfirmationResp;
+import in.gov.udiseplus.kv.report.bean.TransProfileV2Resp;
 import in.gov.udiseplus.kv.report.pdf.GenerateTeacherDetailsPdf;
 import in.gov.udiseplus.kv.report.pdf.TransManagementPdf;
 import in.gov.udiseplus.kv.report.service.TeacherProfileService;
+import in.gov.udiseplus.kv.report.utill.CommonMethods;
 import in.gov.udiseplus.kv.report.utill.ErrorResponse;
 import in.gov.udiseplus.kv.report.utill.StandardErrorMessages;
 
@@ -117,11 +121,34 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 	
 	
 	
+	
+	
+	
+	
+	
+	
 
 	@Override
-	public ResponseEntity<?> genTransManagementPdf() throws IOException {
-		return transManagementPdf.downloadTransManagementPdf();
+	public ResponseEntity<?> genTransManagementPdf(String token, String username, Map<String, Object> payload) throws IOException {
+	
+
+		String urlTcDcPointByTeacherIdAndInityear=reportBaseUrl+"/api/teacher/transfer/getTcDcPointByTeacherIdAndInityear";
+		ResponseEntity<?> apiTcDcPointResp=CommonMethods.getApiResponse(token,username,payload,urlTcDcPointByTeacherIdAndInityear,TcDcPointResp.class);
+		TcDcPointResp tcDcPointObj=(TcDcPointResp) apiTcDcPointResp.getBody();
+		
+		
+		String urlTransProfileV2=reportBaseUrl+"/api/transprofile/getTransProfileV2";
+		payload.put("teacherId", 38290);
+		ResponseEntity<?> apiTransProfileV2Resp=CommonMethods.getApiResponse(token,username,payload,urlTransProfileV2,TransProfileV2Resp.class);
+		TransProfileV2Resp transProfileV2Obj=(TransProfileV2Resp) apiTransProfileV2Resp.getBody();
+
+		
+		
+		
+		
+		return transManagementPdf.downloadTransManagementPdf(payload,transProfileV2Obj,tcDcPointObj);
 	}
 
 
+	
 }

@@ -18,7 +18,7 @@ public class ConfirmedTeacherDetailsResp {
     private String message;
 	
 	@JsonProperty("response")
-    private ResponseData response;
+    private TeacherProfileResponseData response;
 	 
 	@JsonProperty("responseCode")
     private String responseCode;

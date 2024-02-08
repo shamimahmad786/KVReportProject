@@ -2,6 +2,7 @@ package in.gov.udiseplus.kv.report.service;
 
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
@@ -17,5 +18,5 @@ public interface TeacherProfileService {
 
 	public ResponseEntity<?> genTeacherConfirmation(String token, String username, Integer teacherId)throws IOException;
 
-	public ResponseEntity<?> genTransManagementPdf()throws IOException;
+	public ResponseEntity<?> genTransManagementPdf(String token, String username, Map<String, Object> payload)throws IOException;
 }

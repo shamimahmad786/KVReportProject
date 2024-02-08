@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,12 +35,16 @@ import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import com.itextpdf.layout.property.VerticalAlignment;
 
 import in.gov.udiseplus.kv.report.bean.Experience;
-import in.gov.udiseplus.kv.report.bean.ResponseData;
+import in.gov.udiseplus.kv.report.bean.TcDcPointResp;
+import in.gov.udiseplus.kv.report.bean.TeacherProfileResponseData;
+import in.gov.udiseplus.kv.report.bean.TransProfileV2;
+import in.gov.udiseplus.kv.report.bean.TransProfileV2Resp;
 import in.gov.udiseplus.kv.report.bean.TeacherConfirmation;
 import in.gov.udiseplus.kv.report.utill.CommonMethodForPdf;
 import in.gov.udiseplus.kv.report.utill.Constants;
@@ -136,7 +141,7 @@ public class TransManagementPdf {
 	
 	
 	
-	public ResponseEntity<?> downloadTransManagementPdf() throws IOException {
+	public ResponseEntity<?> downloadTransManagementPdf(Map<String, Object> payload, TransProfileV2Resp transProfileV2Obj, TcDcPointResp tcDcPointObj) throws IOException {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		PdfWriter write = new PdfWriter(byteArrayOutputStream);
 		write.setSmartMode(true);
@@ -144,66 +149,60 @@ public class TransManagementPdf {
 		PdfDocument pdfDoc = new PdfDocument(write);
 		pdfDoc.setDefaultPageSize(PageSize.A4);
 		Document doc = new Document(pdfDoc);
-		
-		
+
 		Color paraFColor1 = new DeviceRgb(165, 42, 42);
 		Color paraFColor2 = new DeviceRgb(0, 0, 0);
-		
+
 		doc.add(CommonMethodForPdf.createParaGraphBold("Transfer Management", 0f, 20f, 25, paraFColor1, null, TextAlignment.CENTER).setVerticalAlignment(VerticalAlignment.BOTTOM));
-		
-		/*if (dataObj!=null && dataObj.getResponse() !=null && dataObj.getResponse().getTeacherProfile() !=null ) {*/
-			float[] columnWidMainTab = { 1f};
+
+		if ((transProfileV2Obj != null && transProfileV2Obj.getResponse() != null) || tcDcPointObj != null) {
+			float[] columnWidMainTab = { 1f };
 			Table mainTable = new Table(UnitValue.createPercentArray(columnWidMainTab));
 			mainTable.setWidth(UnitValue.createPercentValue(100));
 
-			
-			
-			
-			
-			
-				
-				Table table = getStationTransfer(doc);
+			if (transProfileV2Obj != null && transProfileV2Obj.getResponse() != null) {
+				Table table = getStationTransfer(doc, transProfileV2Obj);
 				mainTable.addCell(new Cell(1, 1).add(table).setBorder(null));
 				mainTable.addCell(CommonMethodForPdf.createCellBold("", 1, 1, 9f).setBorder(null).setPaddingBottom(10));
-			
-				
-				
-				Table table1 = getMiscellaneous(doc);
+			}
+
+			if (transProfileV2Obj != null && transProfileV2Obj.getResponse() != null) {
+				Table table1 = getMiscellaneous(doc,transProfileV2Obj);
 				mainTable.addCell(new Cell(1, 1).add(table1).setBorder(null));
 				mainTable.addCell(CommonMethodForPdf.createCellBold("", 1, 1, 9f).setBorder(null).setPaddingBottom(10));
+			}
+			
+			if(tcDcPointObj !=null ) {
+				Table innerTable = new Table(UnitValue.createPercentArray(new float[] { 1f, .01f, 1f })).setWidth(UnitValue.createPercentValue(100));
 				
-
-				Table innerTable = new Table(UnitValue.createPercentArray(new float[] { 1f,.01f,1f })).setWidth(UnitValue.createPercentValue(100));
-
-				Table tableLeftDcCount = getDcCount(doc);
+				Table tableLeftDcCount = getDcCount(doc,tcDcPointObj);
 				innerTable.addCell(new Cell(1, 1).add(tableLeftDcCount).setBorder(null));
 				innerTable.addCell(new Cell(1, 1).setBorder(null));
-				Table tableRightTCCount = getTCCount(doc);
-				innerTable.addCell(new Cell(1, 1).add(tableRightTCCount).setBorder(null));
 				
+				Table tableRightTCCount = getTCCount(doc,tcDcPointObj);
+				innerTable.addCell(new Cell(1, 1).add(tableRightTCCount).setBorder(null)); 
 				mainTable.addCell(new Cell(1, 1).add(innerTable).setBorder(null));
 				mainTable.addCell(CommonMethodForPdf.createCellBold("", 1, 1, 9f).setBorder(null).setPaddingBottom(10));
-				
+			}
 			
-				Table table2 = getStation(doc);
-				mainTable.addCell(new Cell(1, 1).add(table2));
+			if (transProfileV2Obj != null && transProfileV2Obj.getResponse() != null) {
+				Table tableStation = getStation(doc,transProfileV2Obj,tcDcPointObj);
+				mainTable.addCell(new Cell(1, 1).add(tableStation));
 				mainTable.addCell(CommonMethodForPdf.createCellBold("", 1, 1, 9f).setBorder(null).setPaddingBottom(10));
-				
 				mainTable.addCell(CommonMethodForPdf.createCellBold("", 1, 1, 9f).setBorder(null).setPaddingBottom(50));
-				
-				Table table3 = getUndertaking(doc);
-				mainTable.addCell(new Cell(1, 1).add(table3).setBorder(null));
-				mainTable.addCell(CommonMethodForPdf.createCellBold("", 1, 1, 9f).setBorder(null));
+			}
+			
+			Table tableUndertaking = getUndertaking(doc);
+			mainTable.addCell(new Cell(1, 1).add(tableUndertaking).setBorder(null));
+			mainTable.addCell(CommonMethodForPdf.createCellBold("", 1, 1, 9f).setBorder(null));
 
 			doc.add(mainTable);
 
-			/*} else {
-				doc.add(CommonMethodForPdf.createParaGraphBold("Data not avaliable", 50f, 0f, 25, paraFColor2, null, TextAlignment.CENTER));
-			}*/
+		} else {
+			doc.add(CommonMethodForPdf.createParaGraphBold("Data not avaliable", 50f, 0f, 25, paraFColor2, null, TextAlignment.CENTER));
+		}
 		doc.close();
 
-		
-		
 		/*byteArrayOutputStream.close();
 		byte[] bytes = byteArrayOutputStream.toByteArray();
 		try {
@@ -214,8 +213,7 @@ public class TransManagementPdf {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Disposition", "attachment; filename=TeacherBasicProfilePdf"  + ".pdf");
 		return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(bytes);*/
-		
-		
+
 		byte[] bytes = byteArrayOutputStream.toByteArray();
 		try {
 			bytes = addFooterAndPageNumbers(bytes, "BACD");
@@ -225,7 +223,7 @@ public class TransManagementPdf {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Disposition", "inline; filename=TransferManagement.pdf");
 		return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(bytes);
-		
+
 	}
 	
  
@@ -242,8 +240,6 @@ public class TransManagementPdf {
 			
 			InputStream is1 = getClass().getResourceAsStream("/static/images/checkbox.png");
 			Image imgCheckbox = new Image(ImageDataFactory.create(inputStreamToByteArray(is1)));
-			
-			String data="";
 			
 			table.addCell(CommonMethodForPdf.createCellBold("Undertaking:", 2, 1, 11f).setTextAlignment(TextAlignment.LEFT).setBorder(null));
 			
@@ -264,7 +260,7 @@ public class TransManagementPdf {
 		return table;
 	}
 
-	private Table getStation(Document doc) {
+	private Table getStation(Document doc, TransProfileV2Resp obj, TcDcPointResp tcDcPointObj) {
 		float[] columnWidths = {1.5f,1f,0.5f  ,1.5f,1f,0.5f  ,1.5f,1f,0.5f};
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));
 		table.setWidth(UnitValue.createPercentValue(100));
@@ -277,44 +273,44 @@ public class TransManagementPdf {
 			InputStream is1 = getClass().getResourceAsStream("/static/images/checkbox.png");
 			Image imgCheckbox = new Image(ImageDataFactory.create(inputStreamToByteArray(is1)));
 			
-			String data="";
-			
-			
+
+			TransProfileV2 resp=obj.getResponse();
+
 			table.addCell(CommonMethodForPdf.createCellBold("Station (I)", 1, 1, 9f).setBackgroundColor(new DeviceRgb(246,249,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"BABUGARH (237)", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
-			table.addCell(new Cell( 1, 1).add((data==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv1StationName()==null?"":resp.getChoiceKv1StationName()+" ("+resp.getChoiceKv1StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
+			table.addCell(new Cell( 1, 1).add((resp.getChoiceKv1StationName()==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
 
 			table.addCell(CommonMethodForPdf.createCellBold("Station (II)", 1, 1, 9f).setBackgroundColor(new DeviceRgb(246,249,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"BELLARY (29)", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
-			table.addCell(new Cell( 1, 1).add((data==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv2StationName()==null?"":resp.getChoiceKv2StationName()+" ("+resp.getChoiceKv1StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
+			table.addCell(new Cell( 1, 1).add((resp.getChoiceKv2StationName()==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
 			
 			table.addCell(CommonMethodForPdf.createCellBold("Station (III)", 1, 1, 9f).setBackgroundColor(new DeviceRgb(246,249,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"CHAKUR BSF (711)", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
-			table.addCell(new Cell( 1, 1).add((data==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv3StationName()==null?"":resp.getChoiceKv3StationName()+" ("+resp.getChoiceKv1StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
+			table.addCell(new Cell( 1, 1).add((resp.getChoiceKv3StationName()==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
 			
 			table.addCell(CommonMethodForPdf.createCell("", 9, 1, 9f).setBorder(null));
 			
 			table.addCell(CommonMethodForPdf.createCellBold("Station (IV)", 1, 1, 9f).setBackgroundColor(new DeviceRgb(246,249,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"AMBALA(170)", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
-			table.addCell(new Cell( 1, 1).add((data==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv4StationName()==null?"":resp.getChoiceKv4StationName()+"("+resp.getChoiceKv1StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
+			table.addCell(new Cell( 1, 1).add((resp.getChoiceKv4StationName()==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
 
 			table.addCell(CommonMethodForPdf.createCellBold("Station (V)", 1, 1, 9f).setBackgroundColor(new DeviceRgb(246,249,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"ADAMPUR (354)", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
-			table.addCell(new Cell( 1, 1).add((data==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv5StationName()==null?"":resp.getChoiceKv5StationName()+"("+resp.getChoiceKv1StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
+			table.addCell(new Cell( 1, 1).add((resp.getChoiceKv5StationName()==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.LEFT).setBorder(null));
 			
 			table.addCell(CommonMethodForPdf.createCell("", 3, 1, 9f).setBorder(null));
 			table.addCell(CommonMethodForPdf.createCell("", 9, 1, 9f).setBorder(null));
 			
 			
-			
-			table.addCell(CommonMethodForPdf.createCellBold("Total DC Count", 1, 1, 9f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
-			table.addCell(new Cell( 1, 1).add((data==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"-20", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBorder(null));
-			
-			table.addCell(CommonMethodForPdf.createCellBold("Total TC Count", 1, 1, 9f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
-			table.addCell(new Cell( 1, 1).add((data==null?imgUnCheckbox:imgCheckbox).setHeight(15f)).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"84", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBorder(null));
-
+			if(tcDcPointObj !=null) {
+				table.addCell(CommonMethodForPdf.createCellBold("Total DC Count", 1, 1, 9f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
+				table.addCell(new Cell( 1, 1).add((tcDcPointObj.getDcTotalPoint()==null?imgUnCheckbox:imgCheckbox).setHeight(15f).setHorizontalAlignment(HorizontalAlignment.RIGHT)).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
+				table.addCell(CommonMethodForPdf.createCell(tcDcPointObj.getDcTotalPoint()==null?"":tcDcPointObj.getDcTotalPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBorder(null));
+				
+				table.addCell(CommonMethodForPdf.createCellBold("Total TC Count", 1, 1, 9f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER).setBorder(null));
+				table.addCell(new Cell( 1, 1).add((tcDcPointObj.getTcTotalPoint()==null?imgUnCheckbox:imgCheckbox).setHeight(15f).setHorizontalAlignment(HorizontalAlignment.RIGHT)).setTextAlignment(TextAlignment.RIGHT).setBorder(null));
+				table.addCell(CommonMethodForPdf.createCell(tcDcPointObj.getTcTotalPoint()==null?"":tcDcPointObj.getTcTotalPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBorder(null));
+			}
 			
 			
 			
@@ -327,7 +323,7 @@ public class TransManagementPdf {
 		return table;
 	}
 
-	private Table getTCCount(Document doc) {
+	private Table getTCCount(Document doc, TcDcPointResp obj) {
 
 		float[] columnWidths = {.5f , 8f , 0.8f};
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));
@@ -342,24 +338,21 @@ public class TransManagementPdf {
 			table.addCell(CommonMethodForPdf.createCellBold("S.No.", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Question Description", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Points", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
-			
-			
-			String data="";
-			
+
 			table.addCell(CommonMethodForPdf.createCellBold("1", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Continuous Active Stay at station as on 30th june for all stations excluding periods of absence (any kind of leave other than maternity Leave) of 30 days or more at normal station and 45 days or more at Hard/NER/Priorty stations, irrespective of cadre.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"44", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getTcStayAtStation()==null?"":obj.getTcStayAtStation()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 
 			table.addCell(CommonMethodForPdf.createCell("2", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("PwD employees", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"40", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCell(obj.getTcPeriodAbsence()==null?"":obj.getTcPeriodAbsence()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("3", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Completion of prescribed tenure in Hard/NER/Priority stations at present place of posting.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getTcTenureHardPoint()==null?"":obj.getTcTenureHardPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			table.addCell(CommonMethodForPdf.createCell("4", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("Clarification: If an employee qualifies on more than one ground, the points shall be limited to a maximum of (+) 35 only.", 1, 1, 9f)
@@ -367,24 +360,24 @@ public class TransManagementPdf {
 					.add(new Paragraph("a. Medical ground(MDG).").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setFontSize(9f).setPaddingLeft(5f).setPaddingTop(7f))
 					.add(new Paragraph("b. Death of Family person(DFP).").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setFontSize(9f).setPaddingLeft(5f).setPaddingTop(7f))
 					.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"35", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCell(obj.getTcMdDfGroungPoint()==null?"":obj.getTcMdDfGroungPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("5", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Less than three years to retire (LTR).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getTcLtrPoint()==null?"":obj.getTcLtrPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			table.addCell(CommonMethodForPdf.createCell("6", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("Single Parent.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCell(obj.getTcSinglePoint()==null?"":obj.getTcSinglePoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("7", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Spouse if a KVS Employee and posted at the choice station.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 4, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getTcSpousePoint()==null?"":obj.getTcSpousePoint()+"", 1, 4, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			table.addCell(CommonMethodForPdf.createCell("8", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("Spouse if a Central Government/Central Govt. Autonomous body/Central Govt. Public Sector Undertaking/ Defence Employee and Central Armed Police Forces employee posted at the choice station.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
@@ -401,11 +394,11 @@ public class TransManagementPdf {
 			
 			table.addCell(CommonMethodForPdf.createCellBold("11", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Members of recognized associations of KVS staff who are also members of JCM at KVS regional offices and / or KVS Headquarters. Note: - Benefit will be given only if they are posted in KVs located at the station of Regional Office/ ZIET.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getTcRjcmNjcmPoint()==null?"":obj.getTcRjcmNjcmPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setMinHeight(112f));
 			
 
 			table.addCell(CommonMethodForPdf.createCellBold("Total Transfer Counts", 2, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"84", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getTcTotalPoint()==null?"":obj.getTcTotalPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 
 			
 		} catch (Exception e) {
@@ -418,7 +411,7 @@ public class TransManagementPdf {
 	
 	}
 
-	private Table getDcCount(Document doc) {
+	private Table getDcCount(Document doc, TcDcPointResp obj) {
 		float[] columnWidths = {.5f , 8f , 0.8f};
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));
 		table.setWidth(UnitValue.createPercentValue(100));
@@ -433,50 +426,48 @@ public class TransManagementPdf {
 			table.addCell(CommonMethodForPdf.createCellBold("Question Description", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Points", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
 			
-			
-			String data="";
-			
+
 			table.addCell(CommonMethodForPdf.createCellBold("1", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Stay at a station as on 30th June in complete years irrespective of Cadre Clarification.", 1, 1, 9f)
 					.add(new Paragraph("a. This should be line  2, and it is!").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setFontSize(9f).setPaddingLeft(5f).setPaddingTop(7f))
 					.add(new Paragraph("b. If an employee transferred from station \"A\" to station \"B\" returns to the station \"A\" on request without completing three years of stay at station \"B\" then the period of stay at station \"A\" will be calculated as total number of years served at station \"A\" prior to his posting at \"B\" and the number of years served after his return to station \"A\" taken together.").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setFontSize(9f).setPaddingLeft(7f).setPaddingTop(7f))
 					.setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getDcStayAtStation()==null?"":obj.getDcStayAtStation()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 
 			table.addCell(CommonMethodForPdf.createCell("2", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("Whether the employee below 40 years (as on 30th June of the year) has completed one tenure at Hard/NER/Priority station (during entire service).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"N", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCell(obj.getDcTenureHardPoint()==null?"":obj.getDcTenureHardPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("3", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("PwD employees", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"-20", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getDcPeriodAbsence()==null?"":obj.getDcPeriodAbsence()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			table.addCell(CommonMethodForPdf.createCell("4", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("Medical ground (MDG)/Death of family person (DFP)", 1, 1, 9f)
 					.add(new Paragraph("a. Medical ground (MDG).").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setFontSize(9f).setPaddingLeft(7f).setPaddingTop(7f))
 					.add(new Paragraph("b. Death of Family person (DFP).").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setFontSize(9f).setPaddingLeft(7f).setPaddingTop(7f))
 					.setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"-14", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCell(obj.getDcMdDfGroungPoint()==null?"":obj.getDcMdDfGroungPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("5", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Less than three years to retire (LTR).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getDcLtrPoint()==null?"":obj.getDcLtrPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			table.addCell(CommonMethodForPdf.createCell("6", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("Single Parent.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCell(obj.getDcSinglePoint()==null?"":obj.getDcSinglePoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("7", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Spouse if a KVS Employee and posted at the same station.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 4, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getDcSpousePoint()==null?"":obj.getDcSpousePoint()+"", 1, 4, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			table.addCell(CommonMethodForPdf.createCell("8", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCell("Spouse if a Central Government/Central body/Central Govt. Public Sector Undertaking/ Defence Employee and Central Armed Police Forces employee posted at the same station.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
@@ -493,11 +484,11 @@ public class TransManagementPdf {
 			
 			table.addCell(CommonMethodForPdf.createCellBold("11", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCell("Members of recognized associations of KVS staff who are also members of JCM at KVS regional offices and / or KVS Headquarters. Note: - Benefit will be given only if they are posted in KVs located at the station of Regional Office/ ZIET.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"0", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getDcRjcmNjcmPoint()==null?"":obj.getDcRjcmNjcmPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 
 			table.addCell(CommonMethodForPdf.createCellBold("Total Displacement Count", 2, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"-20", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCellBold(obj.getDcTotalPoint()==null?"":obj.getDcTotalPoint()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 
 			
 		} catch (Exception e) {
@@ -512,61 +503,59 @@ public class TransManagementPdf {
 	
 	
 	
-	private Table getMiscellaneous(Document doc) {
+	private Table getMiscellaneous(Document doc, TransProfileV2Resp obj) {
 		float[] columnWidths = {.5f , 8f , 0.8f};
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));
 		table.setWidth(UnitValue.createPercentValue(100));
 		
 		try {
 
-			String data="";
-			
+			TransProfileV2 resp=obj.getResponse();
 			table.addCell(CommonMethodForPdf.createCellBold("Miscellaneous", 3, 1, 11f).setBackgroundColor(new DeviceRgb(116,146,203)).setTextAlignment(TextAlignment.CENTER).setFontColor(DeviceRgb.WHITE));
-			
-			
+
 			table.addCell(CommonMethodForPdf.createCellBold("1", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Whether the employee is seeking benefit of spouse who is working at the same station where employee is posted/transfer is being sought for.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"Yes", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getSpouseKvsYnD()==null?"":resp.getSpouseKvsYnD()==1?"Yes":"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 
 			
 			table.addCell(CommonMethodForPdf.createCellBold("2", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCellBold("Whether the employee is seeking benefit of medical ground (MDG Ground).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"Yes", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getPersonalStatusMdgD()==null?"":resp.getPersonalStatusMdgD()==1?"Yes":"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("3", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Whether the employee is seeking benefit of single parent (SP Ground).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"Yes", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getPersonalStatusSpD()==null?"":resp.getPersonalStatusSpD()==1?"Yes":"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("4", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCellBold("Whether the employee is seeking benefit of Death of Family Person (DFP Ground).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"Yes", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getPersonalStatusDfpD()==null?"":resp.getPersonalStatusDfpD()==1?"Yes":"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("5", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Whether your are main care-giver to the person with disability in the family (i.e spouse/son/daughter).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"Yes", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getCareGiverDisabilityName()==null?"":resp.getCareGiverDisabilityName(), 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("6", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCellBold("Members of JCM at KVS Regional Office (RJCM) / KVS Headquarters (NJCM).", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"None", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getMemberJCM()==null?"":resp.getMemberJCM()==0?"None":"Yes", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("7", 1, 1, 9f) .setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Active stay (in years) refer 2 (i) of Part- 1 of Transfer Policy 2023.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"22", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getTransferId()==null?"":resp.getTransferId()+"", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("8", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			table.addCell(CommonMethodForPdf.createCellBold("Whether disciplinary proceedings are in progress.", 1, 1, 9f).setTextAlignment(TextAlignment.LEFT).setBackgroundColor(new DeviceRgb(246,249,255)));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getDisciplinaryYn()==null?"":resp.getDisciplinaryYn()==1?"Yes":"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER).setBackgroundColor(new DeviceRgb(246,249,255)));
 			
 			
 			table.addCell(CommonMethodForPdf.createCellBold("9", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Whether, the employee has completed one tenure at hard/NER/Priority station(during entire service).", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
-			table.addCell(CommonMethodForPdf.createCellBold(data==null?"":data+"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCellBold(resp.getSurveHardYn()==null?"":resp.getSurveHardYn()==1?"Yes":"No", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
 			
 			
 			
@@ -581,7 +570,7 @@ public class TransManagementPdf {
 		return table;
 	}
 
-	private Table getStationTransfer(Document doc) throws IOException {
+	private Table getStationTransfer(Document doc, TransProfileV2Resp obj) throws IOException {
 		float[] columnWidths = {1f , 1f , 1f ,1f , 1f };
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));
 		table.setWidth(UnitValue.createPercentValue(100));
@@ -590,9 +579,7 @@ public class TransManagementPdf {
 			
 			table.addCell(CommonMethodForPdf.createCellBold("Choice Of Station (Transfer)", 6, 1, 11f).setBackgroundColor(new DeviceRgb(116,146,203)).setTextAlignment(TextAlignment.CENTER).setFontColor(DeviceRgb.WHITE));
 
-			
-			String data="";
-			
+
 			table.addCell(CommonMethodForPdf.createCellBold("Station name", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Station name", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
 			table.addCell(CommonMethodForPdf.createCellBold("Station name", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
@@ -600,15 +587,13 @@ public class TransManagementPdf {
 			table.addCell(CommonMethodForPdf.createCellBold("Station name", 1, 1, 10f).setBackgroundColor(new DeviceRgb(229,238,255)).setTextAlignment(TextAlignment.CENTER));
 			
 			
-			
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"BABUGARH", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"BELLARY", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"CHAKUR BSF", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"AMBALA", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
-			table.addCell(CommonMethodForPdf.createCell(data==null?"":data+"ADAMPUR", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
-			
-			
-			
+			TransProfileV2 resp=obj.getResponse();
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv1StationName()==null?"":resp.getChoiceKv1StationName()+"("+resp.getChoiceKv1StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv2StationName()==null?"":resp.getChoiceKv2StationName()+"("+resp.getChoiceKv2StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv3StationName()==null?"":resp.getChoiceKv3StationName()+"("+resp.getChoiceKv3StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv4StationName()==null?"":resp.getChoiceKv4StationName()+"("+resp.getChoiceKv4StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+			table.addCell(CommonMethodForPdf.createCell(resp.getChoiceKv5StationName()==null?"":resp.getChoiceKv5StationName()+"("+resp.getChoiceKv5StationCode()+")", 1, 1, 9f).setTextAlignment(TextAlignment.CENTER));
+
 			
 		} catch (Exception e) {
 			e.printStackTrace();

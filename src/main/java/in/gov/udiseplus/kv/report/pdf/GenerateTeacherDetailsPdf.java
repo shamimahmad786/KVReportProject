@@ -43,7 +43,7 @@ import com.itextpdf.layout.property.VerticalAlignment;
 
 import in.gov.udiseplus.kv.report.bean.ConfirmedTeacherDetailsResp;
 import in.gov.udiseplus.kv.report.bean.Experience;
-import in.gov.udiseplus.kv.report.bean.ResponseData;
+import in.gov.udiseplus.kv.report.bean.TeacherProfileResponseData;
 import in.gov.udiseplus.kv.report.bean.TeacherConfirmation;
 import in.gov.udiseplus.kv.report.bean.TeacherProfile;
 import in.gov.udiseplus.kv.report.utill.CommonMethodForPdf;
@@ -205,7 +205,7 @@ public class GenerateTeacherDetailsPdf {
 	
 
 	
-	private Table getProfileDetails(Document doc, ResponseData responseData) throws IOException {
+	private Table getProfileDetails(Document doc, TeacherProfileResponseData responseData) throws IOException {
 		float[] columnWidths = {1f , 2f , 1f ,1 , 1 , 1};
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));
 		table.setWidth(UnitValue.createPercentValue(100));
@@ -264,7 +264,7 @@ public class GenerateTeacherDetailsPdf {
 		return table;
 	}
 	
-	private Table getExperience(Document doc, ResponseData responseData) throws IOException {
+	private Table getExperience(Document doc, TeacherProfileResponseData responseData) throws IOException {
 		float[] columnWidths = {1f , 2f , 1f ,1 , 1 , 1};
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));
 		table.setWidth(UnitValue.createPercentValue(100));
