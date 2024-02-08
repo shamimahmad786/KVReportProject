@@ -71,16 +71,14 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 	@Override
 	public ResponseEntity<?> genTransManagementPdf(String token, String username, Map<String, Object> payload) throws IOException {
 	
-
 		ObjectMapper objectMapper = new ObjectMapper();
-		 
 		String jsonBody1 = objectMapper.writeValueAsString(payload);
 		String urlTcDcPointByTeacherIdAndInityear=reportBaseUrl+"/api/teacher/transfer/getTcDcPointByTeacherIdAndInityear";
 		ResponseEntity<?> apiTcDcPointResp=CommonMethods.getApiResponseByPayLoad(token,username,jsonBody1,urlTcDcPointByTeacherIdAndInityear,TcDcPointResp.class);
 		TcDcPointResp tcDcPointObj=(TcDcPointResp) apiTcDcPointResp.getBody();
 		
 
-		payload.put("teacherId", 38290);
+		//payload.put("teacherId", 38290);
 		
 		String jsonBody2 = objectMapper.writeValueAsString(payload);
 		String urlTransProfileV2=reportBaseUrl+"/api/transprofile/getTransProfileV2";
