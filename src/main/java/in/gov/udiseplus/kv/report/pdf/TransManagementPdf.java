@@ -203,17 +203,6 @@ public class TransManagementPdf {
 		}
 		doc.close();
 
-		/*byteArrayOutputStream.close();
-		byte[] bytes = byteArrayOutputStream.toByteArray();
-		try {
-			bytes = addFooterAndPageNumbers(bytes, "ABCD");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Disposition", "attachment; filename=TeacherBasicProfilePdf"  + ".pdf");
-		return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(bytes);*/
-
 		byte[] bytes = byteArrayOutputStream.toByteArray();
 		try {
 			bytes = addFooterAndPageNumbers(bytes, "BACD");
@@ -221,7 +210,8 @@ public class TransManagementPdf {
 			e.printStackTrace();
 		}
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Disposition", "inline; filename=TransferManagement.pdf");
+		headers.add("Content-Disposition", "attachment; filename=TransferManagement.pdf");
+		//headers.add("Content-Disposition", "inline; filename=TransferManagement.pdf");
 		return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(bytes);
 
 	}
