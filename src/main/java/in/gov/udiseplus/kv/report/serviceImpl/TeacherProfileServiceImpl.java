@@ -41,7 +41,7 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    String jsonBody = objectMapper.writeValueAsString(teacherId);
 		String urlApi=reportBaseUrl+"/api/teacher/getConfirmedTeacherDetailsV2";
-		ResponseEntity<?> apiResp=CommonMethods.getApiResponseByJsonPayLoad(token,username,jsonBody,urlApi,ConfirmedTeacherDetailsResp.class);
+		ResponseEntity<?> apiResp=CommonMethods.getApiResponseByPayLoad(token,username,jsonBody,urlApi,ConfirmedTeacherDetailsResp.class);
 		return apiResp;
 	}
 	
@@ -52,7 +52,7 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 		tc.setTeacherId(teacherId);
 		String jsonBody = objectMapper.writeValueAsString(tc);
 	    String urlApi=reportBaseUrl+"/api/teacher/getTeacherConfirmationV2";
-		ResponseEntity<?> apiResp=CommonMethods.getApiResponseByJsonPayLoad(token,username,jsonBody,urlApi,TeacherConfirmationResp.class);
+		ResponseEntity<?> apiResp=CommonMethods.getApiResponseByPayLoad(token,username,jsonBody,urlApi,TeacherConfirmationResp.class);
 		return apiResp;
 	}
 
@@ -76,7 +76,7 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 		 
 		String jsonBody1 = objectMapper.writeValueAsString(payload);
 		String urlTcDcPointByTeacherIdAndInityear=reportBaseUrl+"/api/teacher/transfer/getTcDcPointByTeacherIdAndInityear";
-		ResponseEntity<?> apiTcDcPointResp=CommonMethods.getApiResponseByJsonPayLoad(token,username,jsonBody1,urlTcDcPointByTeacherIdAndInityear,TcDcPointResp.class);
+		ResponseEntity<?> apiTcDcPointResp=CommonMethods.getApiResponseByPayLoad(token,username,jsonBody1,urlTcDcPointByTeacherIdAndInityear,TcDcPointResp.class);
 		TcDcPointResp tcDcPointObj=(TcDcPointResp) apiTcDcPointResp.getBody();
 		
 
@@ -84,7 +84,7 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 		
 		String jsonBody2 = objectMapper.writeValueAsString(payload);
 		String urlTransProfileV2=reportBaseUrl+"/api/transprofile/getTransProfileV2";
-		ResponseEntity<?> apiTransProfileV2Resp=CommonMethods.getApiResponseByJsonPayLoad(token,username,jsonBody2,urlTransProfileV2,TransProfileV2Resp.class);
+		ResponseEntity<?> apiTransProfileV2Resp=CommonMethods.getApiResponseByPayLoad(token,username,jsonBody2,urlTransProfileV2,TransProfileV2Resp.class);
 		TransProfileV2Resp transProfileV2Obj=(TransProfileV2Resp) apiTransProfileV2Resp.getBody();
 
 		

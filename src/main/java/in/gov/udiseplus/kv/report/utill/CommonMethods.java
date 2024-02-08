@@ -18,7 +18,7 @@ public class CommonMethods {
 	private static RestTemplate restTemplate = new RestTemplate();
 	
 	@SuppressWarnings("unchecked")
-	public static <T> ResponseEntity<?> getApiResponseByJsonPayLoad(String token, String username, String jsonBody, String url, Class<T> responseType) throws IOException {
+	public static <T> ResponseEntity<?> getApiResponseByPayLoad(String token, String username, String jsonBody, String url, Class<T> responseType) throws IOException {
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.TEXT_PLAIN);
 	    headers.set("username", username);
