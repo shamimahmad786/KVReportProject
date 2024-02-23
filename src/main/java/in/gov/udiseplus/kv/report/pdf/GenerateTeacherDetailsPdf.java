@@ -34,6 +34,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.extgstate.PdfExtGState;
 import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
+import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
@@ -184,6 +185,11 @@ public class GenerateTeacherDetailsPdf {
 			mainTable1.addCell(c3);
 			}
 
+			
+			
+			Table tableSign = getSign(doc);
+			mainTable1.addCell(new Cell(1, 1).add(tableSign).setBorder(Border.NO_BORDER));
+			
 			doc.add(mainTable1);
 
 		} else {
@@ -205,6 +211,24 @@ public class GenerateTeacherDetailsPdf {
 	
 
 	
+	private Table getSign(Document doc) throws IOException {
+		float[] columnWidths = {2f ,4f , 2f};
+		Table table = new Table(UnitValue.createPercentArray(columnWidths));
+		table.setWidth(UnitValue.createPercentValue(100));
+		
+
+		table.addCell(CommonMethodForPdf.createCell("I here by confirm above details are true and accurate.", 3, 1, 14f).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT).setPaddingBottom(20f));
+		
+		table.addCell(CommonMethodForPdf.createCell("Controller Officer", 1, 1, 10f).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.LEFT).setPadding(0));
+		table.addCell(CommonMethodForPdf.createCell("", 1, 1, 9f).setBorder(Border.NO_BORDER).setPadding(0));
+		table.addCell(CommonMethodForPdf.createCell("Employee", 1, 1, 10f).setBorder(Border.NO_BORDER).setTextAlignment(TextAlignment.RIGHT).setPadding(0));
+		
+		table.addCell(CommonMethodForPdf.createCell("Signature & Date", 1, 1, 10f).setBorder(Border.NO_BORDER).setUnderline().setTextAlignment(TextAlignment.LEFT).setPadding(0));
+		table.addCell(CommonMethodForPdf.createCell("", 1, 1, 9f).setBorder(Border.NO_BORDER).setPadding(0));
+		table.addCell(CommonMethodForPdf.createCell("Signature & Date", 1, 1, 10f).setBorder(Border.NO_BORDER).setUnderline().setTextAlignment(TextAlignment.RIGHT).setPadding(0));
+		return table;
+	}
+
 	private Table getProfileDetails(Document doc, TeacherProfileResponseData responseData) throws IOException {
 		float[] columnWidths = {1f , 2f , 1f ,1 , 1 , 1};
 		Table table = new Table(UnitValue.createPercentArray(columnWidths));

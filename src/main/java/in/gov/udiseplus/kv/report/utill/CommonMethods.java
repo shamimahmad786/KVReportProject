@@ -23,6 +23,8 @@ public class CommonMethods {
 	    headers.setContentType(MediaType.TEXT_PLAIN);
 	    headers.set("username", username);
 	    headers.set("Authorization", token);
+	    headers.set("TYPE-CHECK", "99");
+	    
 
 	    HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, headers);
 	    try {
@@ -31,8 +33,10 @@ public class CommonMethods {
 	        HttpHeaders respHeaders = httpResponse.getHeaders();
 
 	        if (responseBody != null) {
+	        	System.out.println("res data-->"+responseBody);
 	            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).headers(respHeaders).body(responseBody);
 	        } else {
+	        	System.out.println("response null");
 	            return (ResponseEntity<?>) ResponseEntity.ok(new Response(new ErrorResponse(StandardErrorMessages.EXCEPTION)));
 	        }
 	    } catch (HttpServerErrorException ex) {

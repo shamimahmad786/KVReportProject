@@ -42,6 +42,7 @@ public class TeacherProfileServiceImpl implements TeacherProfileService {
 	    String jsonBody = objectMapper.writeValueAsString(teacherId);
 		String urlApi=reportBaseUrl+"/api/teacher/getConfirmedTeacherDetailsV2";
 		ResponseEntity<?> apiResp=CommonMethods.getApiResponseByPayLoad(token,username,jsonBody,urlApi,ConfirmedTeacherDetailsResp.class);
+		System.out.println(apiResp.getBody());
 		return apiResp;
 	}
 	

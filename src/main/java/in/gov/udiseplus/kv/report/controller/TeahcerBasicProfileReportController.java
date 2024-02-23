@@ -30,16 +30,17 @@ public class TeahcerBasicProfileReportController {
 
 	@GetMapping(value = "/getTeacherBasicDetailPdf")
 	public ResponseEntity<?> fetchTeacherBasicDetailPdf(
-	/*	@RequestParam(value ="token", required = true) String token,
+		@RequestParam(value ="token", required = true) String token,
 		@RequestParam(value ="username", required = true) String username,
-		@RequestParam(value ="teacherId", required = true) Integer teacherId*/
+		@RequestParam(value ="teacherId", required = true) Integer teacherId
 	) throws IOException {
  
-		String token="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrdl8xODE0Iiwic2NvcGVzIjpbeyJhdXRob3JpdHkiOiJVU0VSIn1dLCJpc3MiOiJodHRwOi8vaGNlbGFsLmNvbSIsImlhdCI6MTcwNzM2OTg3MSwiZXhwIjoxNzA3NDU2MjcxfQ.DXVwqxY9e8ga3YSb0-fKCDc5FlGCCOXlvDlW2mtv8ec";
-		String username="kv_1814";
-		Integer teacherId=30281;
+//		String token="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJrdl8xODE0Iiwic2NvcGVzIjpbeyJhdXRob3JpdHkiOiJVU0VSIn1dLCJpc3MiOiJodHRwOi8vaGNlbGFsLmNvbSIsImlhdCI6MTcwNzM2OTg3MSwiZXhwIjoxNzA3NDU2MjcxfQ.DXVwqxY9e8ga3YSb0-fKCDc5FlGCCOXlvDlW2mtv8ec";
+//		String username="kv_1814";
+//		Integer teacherId=30281;
 		
 		ResponseEntity<?> apiResp=teacherProfileService.teacherProfileReport(token,username,teacherId);
+		System.out.println("apiResp--->"+apiResp.getBody().toString());
 		ConfirmedTeacherDetailsResp dataObj=(ConfirmedTeacherDetailsResp) apiResp.getBody();
 		
 		ResponseEntity<?> apiResp2= teacherProfileService.genTeacherConfirmation(token,username,teacherId);
