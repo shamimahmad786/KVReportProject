@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Table Example</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .header {
+            background-color: blue;
+            color: white;
+            border: 1px solid black; /* Add border to table header cells */
+        }
+        .center-table {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50vh; /* Adjust the height as needed */
+        }
+        .fa-download {
+            color: green;
+            text-align: center; /* Align the icon in the center */
+        }
+        .download-cell {
+            text-align: center; /* Center the content of the download cell */
+            border: 1px solid black; /* Add border to table body cells */
+        }
+        table {
+            border-collapse: collapse; /* Ensure borders are collapsed into a single border */
+            /*width: 100%; /* Set table width to 100% of its container */
+        }
+    </style>
+</head>
+<body>
+    <div class="center-table">
+        <table>
+            <thead>
+                <tr>
+                    <th class="header">Sr No.</th>
+                    <th class="header">Pdf File Name</th>
+                    <th class="header">Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="download-cell">1</td>
+                    <td class="download-cell" style="text-align: left;" >TGT 80104</tdclass="download-cell">
+                    <td class="download-cell"><a href="/api/transfer-order/-1/23/24" target="_blank"><i class="fas fa-download"></i></a></td>
+                </tr>
+                <tr>
+                    <td class="download-cell">2</td>
+                    <td class="download-cell" style="text-align: left;">TGT 8498</td>
+                    <td class="download-cell"><a href="/api/transfer-order/1/23/24" target="_blank"><i class="fas fa-download"></i></a></td>
+                </tr>
+                <tr>
+                    <td class="download-cell">3</td>
+                    <td class="download-cell" style="text-align: left;">Primary_Teacher</td>
+                    <td class="download-cell"><a href="/api/transfer-order/2/23/24" target="_blank"><i class="fas fa-download"></i></a></td>
+                </tr>
+                <tr>
+                    <td class="download-cell">4</td>
+                    <td class="download-cell" style="text-align: left;">Primary Teacher 72584</tdclass="download-cell">
+                    <td class="download-cell"><a href="/api/transfer-order/3/23/24" target="_blank"><i class="fas fa-download"></i></a></td>
+                </tr>
+                <tr>
+                    <td class="download-cell">5</td>
+                    <td class="download-cell" style="text-align: left;">TGT 9977</tdclass="download-cell">
+                    <td class="download-cell"><a href="/api/transfer-order/4/23/24" target="_blank"><i class="fas fa-download"></i></a></td>
+                </tr>
+                
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
